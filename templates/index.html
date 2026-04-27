@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GradeIQ — Intelligent Assessment</title>
+    <meta name="description" content="Automated answer grading system using computer vision.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+    <div id="init-loader" class="init-loader"> <!-- loading screen -->
+        <div class="init-loader-content">
+            <div class="init-spinner"></div>
+            <h1 class="init-title">Starting Environment...</h1>
+            <p class="init-subtitle">Loading grading engines. This may take up to a minute on cold start.</p>
+        </div>
+    </div>
+
+    <nav class="navbar"> <!-- top bar -->
+        <div class="nav-container">
+            <div class="nav-brand">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="brand-icon">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                </svg>
+                <span>GradeIQ</span>
+            </div>
+            <div class="nav-links">
+                <a href="#" class="active">Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+
+        <div id="input-view" class="view-section active"> <!-- upload section -->
+            <header class="page-header center-text">
+                <h1 class="page-title">New Assessment</h1>
+                <p class="page-desc">Upload student answer sheets for automated grading.</p>
+                <button type="button" class="btn-demo mt-4" id="demo-btn">Load Demo Configuration</button>
+            </header>
+
+            <form id="grading-form" class="card config-form mx-auto">
+                <div class="form-section">
+                    <h3 class="section-title">1. Reference Data</h3>
+                    <div class="form-group">
+                        <label for="model-answer">Answer Key</label>
+                        <textarea id="model-answer" name="model_answer" rows="4"
+                            placeholder="Enter the exact correct answer here..." required></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="max-marks">Maximum Score</label>
+                            <input type="number" id="max-marks" name="max_marks" min="1" max="100" value="10" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Debug Tools</label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="debug-mode-check" checked>
+                                <span>Enable Vision Diagnostics</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-header-row">
+                        <h3 class="section-title">2. Student Submissions</h3>
+                        <div class="tabs" id="mode-tabs">
+                            <button type="button" class="tab active" data-mode="zip">Scans (ZIP)</button>
+                            <button type="button" class="tab" data-mode="manual">Raw Text</button>
+                        </div>
+                    </div>
+
+                    <div id="zip-input-group" class="input-pane"> <!-- zip upload -->
+                        <div class="upload-zone" id="drop-zone">
+                            <input type="file" id="file-input" name="answer_sheets" accept=".zip" hidden>
+                            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.5">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            <h4>Click to upload ZIP archive</h4>
+                            <p>or drag and drop here</p>
+                        </div>
+                        <div id="file-info" class="file-info hidden">
+                            <span id="file-name" class="file-name"></span>
+                            <button type="button" id="remove-file" class="btn-clear">&times;</button>
+                        </div>
+                    </div>
+
+                    <div id="manual-input-group" class="input-pane hidden"> <!-- manual text entry -->
+                        <textarea id="manual-answers" rows="6"
+                            placeholder="Paste student answers here (one per line)..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary btn-large" id="submit-btn">
+                        <span class="btn-text">Run Assessment</span>
+                        <div class="spinner-small hidden" id="submit-spinner"></div>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div id="progress-view" class="view-section hidden"> <!-- progress screen -->
+            <div class="card state-card mx-auto">
+                <div class="progress-spinner"></div>
+                <h3 id="progress-title">Processing Submissions</h3>
+                <p id="progress-detail">Executing OCR and feature extraction...</p>
+            </div>
+        </div>
+
+        <div id="results-view" class="view-section hidden"> <!-- results screen -->
+            <div class="results-header-bar">
+                <div>
+                    <h2 class="page-title">Assessment Complete</h2>
+                    <p id="results-summary" class="page-desc">Processed 0 submissions.</p>
+                </div>
+                <div class="results-actions">
+                    <button type="button" id="new-assessment-btn" class="btn-secondary">New Assessment</button>
+                    <button type="button" id="download-btn" class="btn-primary">Export CSV</button>
+                </div>
+            </div>
+
+            <div class="results-list" id="results-grid"> <!-- results go here -->
+
+            </div>
+        </div>
+
+    </main>
+
+    <div id="vision-modal" class="modal hidden"> <!-- debug modal -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Document Scan Diagnostics</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="vision-container" id="vision-container"> <!-- image with boxes -->
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div> <!-- alerts -->
+
+    <script src="/static/app.js"></script>
+</body>
+
+</html>

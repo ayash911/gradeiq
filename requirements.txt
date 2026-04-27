@@ -1,0 +1,11 @@
+sentence-transformers
+transformers
+python-doctr[torch]
+opencv-python
+flask
+flask-cors
+scikit-learn
+Pillow
+numpy
+pillow-heif
+pyngrok

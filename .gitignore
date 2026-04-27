@@ -1,0 +1,12 @@
+.env
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+grading_results.csv
+grader_*/
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
