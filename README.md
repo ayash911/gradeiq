@@ -65,20 +65,39 @@ The application is built using established machine learning models and web frame
 
 ---
 
-### Setup and Configuration
-
-GradeIQ is designed to be highly customizable. You do not need to modify the code to adjust its behavior; all primary settings are managed via an environment file.
-
-**Installation**
-1. Clone the repository to your local machine.
-2. Install the necessary Python packages listed in the requirements file.
-3. Create a `.env` file in the root directory to store your configuration.
-
-**Customization Options**
-The `.env` file allows you to adjust the system to your specific needs:
-*   **Grading Strictness**: Modify the confidence thresholds required for the system to mark an answer as correct, partially correct, or incorrect.
-*   **Image Processing**: Adjust the intensity of the shadow-removal and contrast filters to match the quality of your specific scanner or camera.
-*   **Model Selection**: Switch between different HuggingFace models for both OCR and NLP tasks if you require specialized performance.
-
-**Running the Application**
-Start the application by running the main Python script. Once the server initializes, you can access the user interface through your web browser to begin processing assessments.
++## Setup and Configuration
++
++### Local Installation
++1.  **Clone the repository**: Download the code to your local machine.
++2.  **Environment Setup**: Create a `.env` file based on `.env.example` and add your `NGROK_TOKEN`.
++3.  **Install Dependencies**: Run `pip install -r requirements.txt`.
++4.  **Run the App**: Start the server using `python app.py`.
++
++### Customization Options
++You can adjust the system behavior via the `.env` file:
++*   **Grading Strictness**: Modify similarity thresholds for scoring.
++*   **Image Processing**: Adjust contrast and shadow-removal intensity.
++*   **Model Selection**: Change the HuggingFace model IDs for OCR or NLP.
++
++---
++
++## How to run in Google Colab
++
++Google Colab is recommended for its free GPU access, which significantly speeds up the OCR and grading process.
++
++1.  **Zip the project**: Compress your local `rmfinal` folder into a file named `rmfinal.zip`.
++2.  **Upload**: Open a new [Google Colab](https://colab.research.google.com/) notebook, click the **Folder icon** on the left, and drag `rmfinal.zip` into the file explorer.
++3.  **Execute the following code**:
++    ```python
++    %cd /content
++    !unzip "rmfinal.zip" && rm "rmfinal.zip"
++    %cd rmfinal
++    !python file.py
++    ```
++4.  **Access the UI**: Once the models load, the output will show a **Public URL** (provided via ngrok). Click that link to open the GradeIQ dashboard.
++
++> [!IMPORTANT]
++> **Cold Start**: The first grading request will trigger a download of several GBs of model data (TrOCR, DeBERTa, LaBSE). This can take 2-5 minutes depending on internet speed. Subsequent grading will be instant.
++
++> [!TIP]
++> For best performance, go to **Runtime > Change runtime type** and select **T4 GPU**.
