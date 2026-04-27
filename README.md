@@ -65,39 +65,39 @@ The application is built using established machine learning models and web frame
 
 ---
 
-+## Setup and Configuration
-+
-+### Local Installation
-+1.  **Clone the repository**: Download the code to your local machine.
-+2.  **Environment Setup**: Create a `.env` file based on `.env.example` and add your `NGROK_TOKEN`.
-+3.  **Install Dependencies**: Run `pip install -r requirements.txt`.
-+4.  **Run the App**: Start the server using `python app.py`.
-+
-+### Customization Options
-+You can adjust the system behavior via the `.env` file:
-+*   **Grading Strictness**: Modify similarity thresholds for scoring.
-+*   **Image Processing**: Adjust contrast and shadow-removal intensity.
-+*   **Model Selection**: Change the HuggingFace model IDs for OCR or NLP.
-+
-+---
-+
-+## How to run in Google Colab
-+
-+Google Colab is recommended for its free GPU access, which significantly speeds up the OCR and grading process.
-+
-+1.  **Zip the project**: Compress your local `rmfinal` folder into a file named `rmfinal.zip`.
-+2.  **Upload**: Open a new [Google Colab](https://colab.research.google.com/) notebook, click the **Folder icon** on the left, and drag `rmfinal.zip` into the file explorer.
-+3.  **Execute the following code**:
-+    ```python
-+    %cd /content
-+    !unzip "rmfinal.zip" && rm "rmfinal.zip"
-+    %cd rmfinal
-+    !python file.py
-+    ```
-+4.  **Access the UI**: Once the models load, the output will show a **Public URL** (provided via ngrok). Click that link to open the GradeIQ dashboard.
-+
-+> [!IMPORTANT]
-+> **Cold Start**: The first grading request will trigger a download of several GBs of model data (TrOCR, DeBERTa, LaBSE). This can take 2-5 minutes depending on internet speed. Subsequent grading will be instant.
-+
-+> [!TIP]
-+> For best performance, go to **Runtime > Change runtime type** and select **T4 GPU**.
+## Setup and Configuration
+
+### Local Installation
+1.  **Clone the repository**: Download the code to your local machine.
+2.  **Environment Setup**: Create a `.env` file based on `.env.example` and add your `NGROK_TOKEN`.
+3.  **Install Dependencies**: Run `pip install -r requirements.txt`.
+4.  **Run the App**: Start the server using `python app.py`.
+
+### Customization Options
+You can adjust the system behavior via the `.env` file:
+*   **Grading Strictness**: Modify similarity thresholds for scoring.
+*   **Image Processing**: Adjust contrast and shadow-removal intensity.
+*   **Model Selection**: Change the HuggingFace model IDs for OCR or NLP.
+
+---
+
+## How to run in Google Colab
+
+Google Colab is recommended for its free GPU access, which significantly speeds up the OCR and grading process.
+
+1.  **Zip the project**: Compress your local `rmfinal` folder into a file named `rmfinal.zip`.
+2.  **Upload**: Open a new [Google Colab](https://colab.research.google.com/) notebook, click the **Folder icon** on the left, and drag `rmfinal.zip` into the file explorer.
+3.  **Execute the following code**:
+    ```python
+    %cd /content
+    !unzip "rmfinal.zip" && rm "rmfinal.zip"
+    %cd rmfinal
+    !python file.py
+    ```
+4.  **Access the UI**: Once the models load, the output will show a **Public URL** (provided via ngrok). Click that link to open the GradeIQ dashboard.
+
+
+> **Cold Start**: The first grading request will trigger a download of several GBs of model data (TrOCR, DeBERTa, LaBSE). This can take 2-5 minutes depending on internet speed. Subsequent grading will be instant.
+
+
+> For best performance, go to **Runtime > Change runtime type** and select **T4 GPU**.
