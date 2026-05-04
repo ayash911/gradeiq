@@ -40,12 +40,12 @@ graph LR
 graph TD
     User((User)) --> Dashboard[Web Interface]
     Dashboard --> Server[Flask API]
-    
+
     subgraph "Machine Learning Engines"
     Server --> Vision[Vision Pipeline]
     Vision --> Logic[NLP Pipeline]
     end
-    
+
     Vision -- Extracted Text --> Logic
     Logic -- Evaluated Scores --> Server
     Server --> Dashboard
@@ -57,27 +57,30 @@ graph TD
 
 The application is built using established machine learning models and web frameworks:
 
-*   **Backend Application**: Python, Flask
-*   **Document Processing**: OpenCV, Pillow, Pillow-Heif
-*   **Optical Character Recognition (OCR)**: Microsoft TrOCR and DocTR
-*   **Natural Language Processing (NLP)**: DeBERTa-v3 and LaBSE via Sentence-Transformers
-*   **Frontend Interface**: HTML, CSS, and Vanilla JavaScript
+- **Backend Application**: Python, Flask
+- **Document Processing**: OpenCV, Pillow, Pillow-Heif
+- **Optical Character Recognition (OCR)**: Microsoft TrOCR and DocTR
+- **Natural Language Processing (NLP)**: DeBERTa-v3 and LaBSE via Sentence-Transformers
+- **Frontend Interface**: HTML, CSS, and Vanilla JavaScript
 
 ---
 
 ## Setup and Configuration
 
 ### Local Installation
+
 1.  **Clone the repository**: Download the code to your local machine.
 2.  **Environment Setup**: Create a `.env` file based on `.env.example` and add your `NGROK_TOKEN`.
 3.  **Install Dependencies**: Run `pip install -r requirements.txt`.
 4.  **Run the App**: Start the server using `python app.py`.
 
 ### Customization Options
+
 You can adjust the system behavior via the `.env` file:
-*   **Grading Strictness**: Modify similarity thresholds for scoring.
-*   **Image Processing**: Adjust contrast and shadow-removal intensity.
-*   **Model Selection**: Change the HuggingFace model IDs for OCR or NLP.
+
+- **Grading Strictness**: Modify similarity thresholds for scoring.
+- **Image Processing**: Adjust contrast and shadow-removal intensity.
+- **Model Selection**: Change the HuggingFace model IDs for OCR or NLP.
 
 ---
 
@@ -85,19 +88,17 @@ You can adjust the system behavior via the `.env` file:
 
 Google Colab is recommended for its free GPU access, which significantly speeds up the OCR and grading process.
 
-1.  **Zip the project**: Compress your local `rmfinal` folder into a file named `rmfinal.zip`.
-2.  **Upload**: Open a new [Google Colab](https://colab.research.google.com/) notebook, click the **Folder icon** on the left, and drag `rmfinal.zip` into the file explorer.
+1.  **Zip the project**: Compress your local `gradeiq` folder into a file named `gradeiq.zip`.
+2.  **Upload**: Open a new [Google Colab](https://colab.research.google.com/) notebook, click the **Folder icon** on the left, and drag `gradeiq.zip` into the file explorer.
 3.  **Execute the following code**:
     ```python
     %cd /content
-    !unzip "rmfinal.zip" && rm "rmfinal.zip"
-    %cd rmfinal
+    !unzip "gradeiq.zip" && rm "gradeiq.zip"
+    %cd gradeiq
     !python file.py
     ```
 4.  **Access the UI**: Once the models load, the output will show a **Public URL** (provided via ngrok). Click that link to open the GradeIQ dashboard.
 
-
 > **Cold Start**: The first grading request will trigger a download of several GBs of model data (TrOCR, DeBERTa, LaBSE). This can take 2-5 minutes depending on internet speed. Subsequent grading will be instant.
-
 
 > For best performance, go to **Runtime > Change runtime type** and select **T4 GPU**.
