@@ -84,21 +84,52 @@ You can adjust the system behavior via the `.env` file:
 
 ---
 
-## How to run in Google Colab
+## Running in Google Colab
 
 Google Colab is recommended for its free GPU access, which significantly speeds up the OCR and grading process.
 
-1.  **Zip the project**: Compress your local `gradeiq` folder into a file named `gradeiq.zip`.
-2.  **Upload**: Open a new [Google Colab](https://colab.research.google.com/) notebook, click the **Folder icon** on the left, and drag `gradeiq.zip` into the file explorer.
-3.  **Execute the following code**:
-    ```python
-    %cd /content
-    !unzip "gradeiq.zip" && rm "gradeiq.zip"
-    %cd gradeiq
-    !python file.py
-    ```
-4.  **Access the UI**: Once the models load, the output will show a **Public URL** (provided via ngrok). Click that link to open the GradeIQ dashboard.
+1. **Open a new Notebook**: Go to [Google Colab](https://colab.research.google.com/).
+2. **Switch to GPU**: Go to **Runtime > Change runtime type** and select **T4 GPU**.
+3. **Run the following cell**:
+   ```python
+   # 1. Clone the project
+   !git clone https://github.com/ayash911/gradeiq.git
+   %cd gradeiq
 
-> **Cold Start**: The first grading request will trigger a download of several GBs of model data (TrOCR, DeBERTa, LaBSE). This can take 2-5 minutes depending on internet speed. Subsequent grading will be instant.
+   # 2. Install dependencies
+   !pip install -r requirements.txt -q
 
-> For best performance, go to **Runtime > Change runtime type** and select **T4 GPU**.
+   # 3. Start the server (Replace NGROK_TOKEN with your actual token)
+   !python3 app.py \
+     --ngrok "NGROK_TOKEN" \
+     --domain "NGROK_DOMAIN" \
+     --port 5000 \
+     --debug True
+   ```
+4. **Access the UI**: Click the **Public URL** (ngrok link) in the output to open the GradeIQ dashboard.
+
+> [!NOTE]
+> **Cold Start**: The first grading request will download several GBs of models. This takes 2-5 minutes but only happens once per session.
+
+---
+
+## CLI Reference
+
+You can now configure the system directly via command-line arguments. These override any settings in your `.env` file.
+
+| Parameter | Description |
+| :--- | :--- |
+| `--ngrok` | Your Ngrok Auth Token |
+| `--domain` | Static Ngrok domain (e.g., `myapp.ngrok-free.dev`) |
+| `--port` | Server port (default: 5000) |
+| `--debug` | Enable Flask debug mode (True/False) |
+| `--det` | OCR detection model (default: `db_resnet50`) |
+| `--reco` | OCR recognition model (default: `crnn_vgg16_bn`) |
+| `--trocr` | TrOCR model name |
+| `--labse` | Sentence similarity model (default: `LaBSE`) |
+| `--nli` | NLI model for logic verification |
+
+For a full list of all available parameters, run:
+```bash
+python3 app.py --help
+```
