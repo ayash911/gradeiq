@@ -39,6 +39,7 @@ def parse_args():
     
     # Infrastructure
     parser.add_argument("--ngrok", dest="NGROK_TOKEN", help="Ngrok auth token for public tunnel")
+    parser.add_argument("--domain", dest="NGROK_DOMAIN", help="Static ngrok domain to use")
     parser.add_argument("--port", dest="PORT", type=int, help="Port to run the server on")
     parser.add_argument("--host", dest="FLASK_HOST", help="Host to run the server on")
     parser.add_argument("--debug", dest="FLASK_DEBUG", help="Enable Flask debug mode (True/False)")
@@ -323,11 +324,18 @@ if __name__ == '__main__':
     print(f"Open http://localhost:{port} in your browser.\n")
     
     ngrok_token = os.getenv('NGROK_TOKEN')
-    if ngrok_token:
+    # Only start ngrok in the main process (avoids double-start in debug mode)
+    if ngrok_token and os.environ.get("WERKZEUG_RUN_MAIN") != "true":
         try:
             from pyngrok import ngrok
             ngrok.set_auth_token(ngrok_token)
-            public_url = ngrok.connect(port).public_url
+            
+            domain = os.getenv('NGROK_DOMAIN')
+            if domain:
+                public_url = ngrok.connect(port, domain=domain).public_url
+            else:
+                public_url = ngrok.connect(port).public_url
+                
             print(f" * ngrok tunnel available at: {public_url}")
         except Exception as e:
             print(f" ! Failed to start ngrok: {e}")
