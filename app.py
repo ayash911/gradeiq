@@ -22,14 +22,65 @@ os.environ["TRANSFORMERS_VERBOSITY"] = "error"
 os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
 os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
 
+import argparse
+
 def load_env():
     if os.path.exists(".env"):
         with open(".env", "r") as f:
             for line in f:
                 if "=" in line and not line.startswith("#"):
                     k, v = line.strip().split("=", 1)
-                    os.environ[k.strip()] = v.strip().strip("'").strip('"')
+                    k = k.strip()
+                    if k not in os.environ:
+                        os.environ[k] = v.strip().strip("'").strip('"')
 
+def parse_args():
+    parser = argparse.ArgumentParser(description="Answer Sheet Grader Server")
+    
+    # Infrastructure
+    parser.add_argument("--ngrok", dest="NGROK_TOKEN", help="Ngrok auth token for public tunnel")
+    parser.add_argument("--port", dest="PORT", type=int, help="Port to run the server on")
+    parser.add_argument("--host", dest="FLASK_HOST", help="Host to run the server on")
+    parser.add_argument("--debug", dest="FLASK_DEBUG", help="Enable Flask debug mode (True/False)")
+    parser.add_argument("--max-upload", dest="MAX_UPLOAD_MB", type=int, help="Max upload size in MB")
+    
+    # OCR Models
+    parser.add_argument("--det", dest="DET_ARCH", help="OCR detection architecture")
+    parser.add_argument("--reco", dest="RECO_ARCH", help="OCR recognition architecture")
+    parser.add_argument("--trocr", dest="TROCR_MODEL", help="TrOCR model name")
+    
+    # Grader Models
+    parser.add_argument("--labse", dest="LABSE_MODEL", help="LaBSE model name")
+    parser.add_argument("--nli", dest="NLI_MODEL", help="NLI model name")
+    
+    # Thresholds & Settings
+    parser.add_argument("--nli-c-thresh", dest="NLI_CONTRADICTION_THRESHOLD", type=float)
+    parser.add_argument("--nli-e-thresh", dest="NLI_ENTAILMENT_THRESHOLD", type=float)
+    parser.add_argument("--nli-c-ratio", dest="NLI_CONTRADICTION_RATIO", type=float)
+    parser.add_argument("--nli-e-ratio", dest="NLI_ENTAILMENT_RATIO", type=float)
+    parser.add_argument("--nli-p-ratio", dest="NLI_PARTIAL_RATIO", type=float)
+    
+    parser.add_argument("--sim-high", dest="SIMILARITY_CORRECT_HIGH", type=float)
+    parser.add_argument("--sim-med", dest="SIMILARITY_CORRECT_MED", type=float)
+    parser.add_argument("--sim-low", dest="SIMILARITY_CORRECT_LOW", type=float)
+    parser.add_argument("--sim-min", dest="SIMILARITY_MIN_THRESHOLD", type=float)
+    parser.add_argument("--sim-max", dest="SIMILARITY_MAX_THRESHOLD", type=float)
+    
+    parser.add_argument("--strike-thresh", dest="STRIKE_THRESHOLD", type=float)
+    parser.add_argument("--scan-sigma", dest="SCAN_SIGMA", type=int)
+    parser.add_argument("--scan-block", dest="SCAN_BLOCK_SIZE", type=int)
+    parser.add_argument("--scan-c", dest="SCAN_C", type=int)
+    parser.add_argument("--pad-x", dest="BOX_PAD_X", type=float)
+    parser.add_argument("--pad-y", dest="BOX_PAD_Y", type=float)
+    
+    args = parser.parse_args()
+    
+    # Apply CLI args to environment before loading .env
+    for key, value in vars(args).items():
+        if value is not None:
+            os.environ[key] = str(value)
+
+parse_args()
 load_env()
 
 # setup flask app
@@ -270,4 +321,15 @@ if __name__ == '__main__':
     debug = os.getenv('FLASK_DEBUG', 'False').lower() == 'true' # debug mode?
 
     print(f"Open http://localhost:{port} in your browser.\n")
+    
+    ngrok_token = os.getenv('NGROK_TOKEN')
+    if ngrok_token:
+        try:
+            from pyngrok import ngrok
+            ngrok.set_auth_token(ngrok_token)
+            public_url = ngrok.connect(port).public_url
+            print(f" * ngrok tunnel available at: {public_url}")
+        except Exception as e:
+            print(f" ! Failed to start ngrok: {e}")
+
     app.run(host=host, port=port, debug=debug) # go go go!
