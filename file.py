@@ -4,7 +4,6 @@ import sys
 import warnings
 import logging
 
-# quiet mode
 warnings.filterwarnings("ignore")
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 os.environ["TRANSFORMERS_VERBOSITY"] = "error"

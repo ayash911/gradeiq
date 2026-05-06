@@ -74,7 +74,7 @@ def scan_filter(img_np: np.ndarray) -> np.ndarray: # make the scan look pretty
         gray = img_np.copy()
 
     sigma = int(os.getenv('SCAN_SIGMA', 51))
-    bg = cv2.GaussianBlur(gray, (0, 0), sigmaX=sigma)
+    bg = cv2.GaussianBlur(gray, (0, 0), sigmaX=sigma) #gaussian blur ( remove shadows)
     shadow_free = cv2.divide(gray, bg, scale=255) # remove shadows
 
     block_size = int(os.getenv('SCAN_BLOCK_SIZE', 21))
@@ -86,10 +86,10 @@ def scan_filter(img_np: np.ndarray) -> np.ndarray: # make the scan look pretty
         cv2.THRESH_BINARY,
         blockSize=block_size,                     
         C=c_val                                          
-    ) # make it black and white
+    ) # make it black and white (Adaptive Thresholding)
 
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2, 2))
-    cleaned = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel) # scrub the noise
+    cleaned = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel) # scrub the noise (Morphological Operations)
 
     result = cv2.cvtColor(cleaned, cv2.COLOR_GRAY2RGB)
     return result
